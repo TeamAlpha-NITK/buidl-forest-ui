@@ -1,4 +1,39 @@
-<template>
+// import slider from 'vue-color/src/components/Slider.vue';
+// import { validationMixin } from 'vuelidate';
+// import {
+//   required,
+//   minValue,
+// } from 'vuelidate/lib/validators'
+// import {Slider} from 'https://cdn.jsdelivr.net/npm/vue-color@2.4.6/dist/vue-color.js';
+
+let defaultColor = {
+  hex: '#194d33',
+  hsl: {
+    h: 150,
+    s: 0.5,
+    l: 0.2,
+    a: 1
+  },
+  hsv: {
+    h: 150,
+    s: 0.66,
+    v: 0.30,
+    a: 1
+  },
+  rgba: {
+    r: 25,
+    g: 77,
+    b: 51,
+    a: 1
+  },
+  a: 1
+}
+export default {
+  name: 'Map',
+  // components: {
+  //   'slider-picker': Picker.Slider,
+  // },
+  template: `
   <div>
     <md-dialog :md-active.sync="showDialog" :md-fullscreen="false">
       <md-dialog-title>Plant a new tree!</md-dialog-title>
@@ -6,18 +41,19 @@
         <md-field :class="getValidationClass('age')">
           <label for="age">Age</label>
           <md-input type="number" name="age" id="age" autocomplete="number" v-model="form.age" :disabled="sending" />
-          <span class="md-error" v-if="!$v.form.age.required">Age is required</span>
+          <span class="md-error" v-if="!form.age.required">Age is required</span>
         </md-field>
         <div>
           <div style="padding-bottom: 8px; color: #777; font-size: larger">Color</div>
-          <slider-picker v-model="form.color" style="max-width: 75vw"/>
+          <!-- <slider-picker v-model="form.color" style="max-width: 75vw"/> -->
+          <input type="color" v-model="form.color">
         </div>
         <md-field :class="getValidationClass('value')">
           <label for="value">Value (in ether)</label>
           <md-input type="number" name="value" id="value" autocomplete="number" v-model="form.value" :disabled="sending" />
-          <span class="md-error" v-if="!$v.form.value.required">Value is required</span>
-          <span class="md-error" v-if="!$v.form.value.minValue">Minimum 0.1 ethers</span>
-          <span class="md-helper-text" v-if="$v.form.value.minValue">Minimum 0.1 ethers</span>
+          <span class="md-error" v-if="!form.value.required">Value is required</span>
+          <span class="md-error" v-if="!form.value.minValue">Minimum 0.1 ethers</span>
+          <span class="md-helper-text" v-if="form.value.minValue">Minimum 0.1 ethers</span>
         </md-field>
       </form>
       <md-dialog-actions>
@@ -46,52 +82,15 @@
       </label>
     </div> -->
   </div>
-</template>
-
-<script>
-// @ is an alias to /src
-import slider from 'vue-color/src/components/Slider.vue';
-import { validationMixin } from 'vuelidate'
-import {
-  required,
-  minValue,
-} from 'vuelidate/lib/validators'
-
-let defaultColor = {
-  hex: '#194d33',
-  hsl: {
-    h: 150,
-    s: 0.5,
-    l: 0.2,
-    a: 1
-  },
-  hsv: {
-    h: 150,
-    s: 0.66,
-    v: 0.30,
-    a: 1
-  },
-  rgba: {
-    r: 25,
-    g: 77,
-    b: 51,
-    a: 1
-  },
-  a: 1
-}
-export default {
-  name: 'Map',
-  components: {
-    'slider-picker': slider,
-  },
-  mixins: [validationMixin],
+  `,
+  // mixins: [validationMixin],
   data: function() {
     return {
       showDialog: false,
       form: {
-        age: null,
+        age: 0,
         color: defaultColor,
-        value: null,
+        value: 0,
       },
       sending: false,
       map: null,
@@ -121,11 +120,11 @@ export default {
   validations: {
     form: {
       age: {
-        required,
+        // required,
       },
       value: {
-        required,
-        minValue: minValue(0.1)
+        // required,
+        // minValue: minValue(0.1)
       }
     }
   },
@@ -216,7 +215,7 @@ export default {
       this.map.setView([this.currentPosition.latitude, this.currentPosition.longitude], this.map.getZoom());
     },
     getValidationClass (fieldName) {
-      const field = this.$v.form[fieldName]
+      const field = this.form[fieldName]
 
       if (field) {
         return {
@@ -225,14 +224,15 @@ export default {
       }
     },
     clearForm () {
-      this.$v.$reset()
+      // this.$v.$reset()
       this.form.age = null
       this.form.color = defaultColor
       this.form.value = null
     },
     createTree() {
-      this.$v.$touch()
-      if (!this.$v.$invalid) {
+      // this.$v.$touch()
+      if (!this.form.$invalid) {
+        console.log(this.form.color);
         let treeDetails = {
           age: parseInt(this.form.age),
           color: web3.utils.fromAscii(this.form.color.hex),
@@ -260,70 +260,12 @@ export default {
         .finally(() => {
             this.showDialog = false;
         });
-        // console.log(treeDetails);
       }
     },
     async loadAllTrees() {
 
     }
-    // layerChanged(layerId, active) {
-    //   const layer = this.layers.find(layer => layer.id === layerId);
-    //   layer.features.forEach((feature) => {
-    //     if (active) {
-    //       feature.leafletObject.addTo(this.map);
-    //     } else {
-    //       feature.leafletObject.removeFrom(this.map);
-    //     }
-    //   });
-    // },
   }
 }
-</script>
 
-<style scoped>
-.map-container {
-  height: 91vh;
-  width: 100%;
-  position: relative;
-}
-.map {
-  height: 91vh;
-  width: 100%;
-  z-index: 1;
-}
-.tree-icon {
-  height: 10px;
-  width: 10px;
-  background-color: brown;
-  border-radius: 50%;
-}
-.my-location {
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-  background-color: whitesmoke;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 20px;
-  bottom: 80px;
-  z-index: 2;
-}
-.my-location:hover, .tree-button:hover {
-  cursor: pointer;
-}
-.tree-button {
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-  background-color: #1eb980;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  z-index: 2;
-}
-</style>
+

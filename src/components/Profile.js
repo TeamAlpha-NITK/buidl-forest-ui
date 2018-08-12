@@ -1,4 +1,11 @@
-<template>
+export default {
+    name: "Profile",
+    data: () => {
+        return {
+            trees: null
+        }
+    },
+    template: `
     <div class="market">
         <h2 style="width: 100%; text-align: center">Profile</h2>
         <div class="md-layout md-gutter md-alignment-center">
@@ -25,17 +32,7 @@
         </div>
         <div style="height: 10vh"></div>
     </div>
-</template>
-
-
-<script>
-export default {
-    name: "Profile",
-    data: () => {
-        return {
-            trees: null
-        }
-    },
+    `,
     mounted() {
         this.loadTrees();
     },
@@ -105,58 +102,3 @@ export default {
         }
     }
 }
-</script>
-
-<style scoped>
-.market {
-    padding: 8px;
-    min-height: 95vh;
-    overflow-x: hidden;
-    background-color: #363537;
-    color: white;
-}
-.tree-item {
-    padding: 4px;
-}
-.tree-card {
-    border-radius: 8px;
-}
-.button {
-    background-color: #ef2d56;
-}
-.tree-text {
-    text-align: left; 
-    padding-left: 32px
-}
-.md-card .md-title {
-    font-size: initial;
-}
-.md-card-header .md-card-media {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-@media only screen and (max-width: 600px) {
-    .tree-card {
-        padding: 2px;
-    }
-    .tree-text {
-        padding-left: 4px;
-    }
-    .md-card-header {
-        padding: 2px;
-    }
-    .md-card-header:last-child {
-        margin-bottom: 2px;
-    }
-    .tree-svg {
-        width: 60px;
-        height: 60px;
-    }
-    .md-card-header .md-card-media {
-        width: 60px;
-        height: 80px;
-        margin-left: 4px;
-    }
-}
-</style>
